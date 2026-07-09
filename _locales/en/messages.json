@@ -1,0 +1,11 @@
+{
+  "extName": {
+    "message": "DieselAtlas: Truck Repair Planner"
+  },
+  "extShortName": {
+    "message": "DieselAtlas"
+  },
+  "extDescription": {
+    "message": "Truck VIN decode, air-brake tool staging, regulated safety gates, job records, and FMCSA-linked evidence for diesel mechanics."
+  }
+}

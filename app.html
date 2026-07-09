@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WrenchAtlas</title>
+    <link rel="icon" href="assets/icon-32.png" sizes="32x32">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main id="app" class="atlas-shell" data-surface="full">
+      <aside class="brand-rail" aria-label="Workspace navigation">
+        <div class="usa-stripe" aria-hidden="true"></div>
+        <section class="brand-lockup">
+          <div class="torque-mark" aria-hidden="true">
+            <span></span>
+          </div>
+          <div>
+            <h1>Wrench<span>Atlas</span></h1>
+            <p id="editionLabel">American Garage Edition</p>
+          </div>
+        </section>
+
+        <section class="mascot-card" aria-label="Mascot">
+          <div class="mini-mark" aria-hidden="true"></div>
+          <div>
+            <strong id="mascotName">Liberty Torque Compass</strong>
+            <span id="mascotTagline">Know the job. Own the repair.</span>
+          </div>
+        </section>
+
+        <section class="workspace-card">
+          <p class="rail-label" id="workspaceLabel">Vehicle workspace</p>
+          <h2 id="railVehicleTitle">2001 Corolla</h2>
+          <p id="railVehicleMeta">Car reference pack</p>
+          <p class="vin-chip" id="railVin">VIN: not decoded</p>
+          <div class="vehicle-etch" aria-hidden="true"></div>
+          <button class="ghost-button" id="saveVehicleButton" type="button">Save vehicle</button>
+        </section>
+
+        <nav class="rail-nav" aria-label="Main sections">
+          <button class="active" type="button" data-jump="overview">
+            <span class="nav-icon">⌂</span> Overview
+          </button>
+          <button type="button" data-jump="vin">
+            <span class="nav-icon">⌕</span> <span id="identifierNavLabel">VIN Decode</span>
+          </button>
+          <button type="button" data-jump="mission">
+            <span class="nav-icon">✓</span> Job Plan
+          </button>
+          <button type="button" data-jump="systems">
+            <span class="nav-icon">⚙</span> Systems
+          </button>
+          <button type="button" data-jump="diagrams">
+            <span class="nav-icon">▣</span> Diagrams
+          </button>
+          <button type="button" data-jump="rights">
+            <span class="nav-icon">★</span> Repair Rights
+          </button>
+          <button type="button" data-jump="source">
+            <span class="nav-icon">↗</span> Evidence
+          </button>
+        </nav>
+
+        <section class="status-card">
+          <strong id="statusTitle">Built for American repair freedom</strong>
+          <span id="statusText">Free, open source, ad-free, and locally saved.</span>
+        </section>
+
+        <footer class="rail-footer">
+          <span>WrenchAtlas</span>
+          <span>v1.5.0</span>
+          <button id="themeToggle" type="button" aria-label="Toggle high contrast">◐</button>
+        </footer>
+      </aside>
+
+      <section class="workspace-main">
+        <header class="topbar" id="vin">
+          <form class="vin-form" id="vinForm">
+            <label for="vinInput" id="identifierLabel">VIN decode</label>
+            <input id="vinInput" name="vin" autocomplete="off" inputmode="latin" spellcheck="false" placeholder="Enter 17-character VIN">
+            <button id="lookupButton" type="submit">Decode</button>
+          </form>
+          <button class="demo-button" id="demoButton" type="button">Load industry demo</button>
+          <button class="icon-button" id="openDataButton" type="button" title="Import open repair data" aria-label="Import open repair data">▥</button>
+          <button class="icon-button" id="resetButton" type="button" title="Reset workspace">↻</button>
+        </header>
+
+        <section class="selector-deck" id="overview" aria-label="Vehicle and system selectors">
+          <div class="mode-strip" id="modeStrip" role="tablist" aria-label="Vehicle mode"></div>
+          <label class="select-card">
+            <span>Vehicle type</span>
+            <select id="typeSelect"></select>
+          </label>
+          <label class="select-card">
+            <span>Make</span>
+            <select id="makeSelect"></select>
+          </label>
+          <label class="select-card">
+            <span>Model</span>
+            <select id="vehicleSelect"></select>
+          </label>
+          <label class="select-card">
+            <span>System</span>
+            <select id="systemSelect"></select>
+          </label>
+          <label class="select-card">
+            <span>Subsystem</span>
+            <select id="subsystemSelect"></select>
+          </label>
+        </section>
+
+        <section class="mission-strip" id="mission" aria-labelledby="missionSummary">
+          <div class="mission-copy">
+            <span id="missionKicker">American garage mission</span>
+            <h2 id="missionSummary">Identify. Tool up. Verify. Repair.</h2>
+            <p id="missionMeta">Select a repair to build the job card.</p>
+          </div>
+          <div class="mission-meter" aria-live="polite">
+            <div class="mission-track" aria-hidden="true"><span id="missionProgressBar"></span></div>
+            <strong id="missionProgress">0 of 0 checks complete</strong>
+          </div>
+          <div class="mission-standard">
+            <strong id="missionStandardTitle">U.S. field format</strong>
+            <span id="missionStandardText">SAE + metric • ft-lb + N-m</span>
+          </div>
+        </section>
+
+        <section class="workbench-grid">
+          <section class="diagram-panel" id="diagrams">
+            <div class="panel-heading">
+              <div>
+                <h2 id="diagramTitle">Exploded view</h2>
+                <p id="diagramSubtitle">Original open reference schematic</p>
+              </div>
+              <div class="diagram-actions">
+                <label class="toggle-row">
+                  <input id="torqueToggle" type="checkbox" checked>
+                  <span>Torque specs</span>
+                </label>
+                <button class="soft-button" id="printButton" type="button">Print / Export</button>
+              </div>
+            </div>
+            <div class="diagram-stage">
+              <div class="zoom-stack" aria-label="Diagram controls">
+                <button type="button" id="zoomIn">+</button>
+                <button type="button" id="zoomOut">−</button>
+                <button type="button" id="zoomReset">⌖</button>
+              </div>
+              <svg id="diagramSvg" role="img" aria-labelledby="diagramTitle diagramSubtitle" viewBox="0 0 920 500"></svg>
+            </div>
+            <ol class="parts-legend" id="partsLegend"></ol>
+          </section>
+
+          <aside class="tool-panel" id="systems">
+            <div class="tool-tabs" role="tablist" aria-label="Tool panel tabs">
+              <button class="active" type="button" data-panel="tools">Tool stack</button>
+              <button type="button" data-panel="data">Evidence</button>
+              <button type="button" data-panel="saved">Garage</button>
+            </div>
+            <div id="toolContent"></div>
+          </aside>
+        </section>
+
+        <section class="field-workflow" id="workflow" aria-labelledby="workflowTitle">
+          <div class="workflow-heading">
+            <div>
+              <span>Repair job card</span>
+              <h2 id="workflowTitle">Field sequence</h2>
+              <p>Check off each item as the repair moves from setup to final verification.</p>
+            </div>
+            <button class="soft-button" id="resetJobButton" type="button">Reset job checks</button>
+          </div>
+          <div class="workflow-layout">
+            <div class="repair-checklist" id="repairChecklist"></div>
+            <label class="job-notes">
+              <span>Garage notes</span>
+              <textarea id="jobNotes" maxlength="2000" placeholder="Part numbers, measurements, observations, or follow-up work"></textarea>
+              <small>Stored only in this browser.</small>
+            </label>
+          </div>
+        </section>
+
+        <section class="rights-band" id="rights" aria-labelledby="rightsTitle">
+          <header class="rights-heading">
+            <span id="rightsKicker">Freedom to fix</span>
+            <h2 id="rightsTitle">Repair ownership is an American garage principle.</h2>
+            <p id="rightsIntro">WrenchAtlas supports owners, independent mechanics, competition, and responsible repairs. These sourced facts are civic information, not legal advice.</p>
+          </header>
+          <div class="rights-grid" id="rightsGrid"></div>
+          <p class="affiliation-note" id="affiliationNote"></p>
+        </section>
+
+        <section class="lower-grid">
+          <section class="saved-strip">
+            <div class="panel-heading compact">
+              <h2>Saved vehicles</h2>
+              <div>
+                <input class="file-input" id="importInput" type="file" accept="application/json,.json">
+                <button class="soft-button" id="importButton" type="button">Import JSON</button>
+                <button class="soft-button" id="addSampleButton" type="button">Add sample</button>
+              </div>
+            </div>
+            <div class="saved-list" id="savedList"></div>
+          </section>
+
+          <section class="opensource-card" id="source">
+            <div class="opensource-icon" aria-hidden="true"></div>
+            <div>
+              <strong id="opensourceTitle">Free American open source</strong>
+              <span id="opensourceText">Community-maintained repair packs with visible evidence limits. Verify critical procedures with official service data.</span>
+            </div>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <script src="variant.js"></script>
+    <script src="data/vehicles.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

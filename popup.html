@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WrenchAtlas</title>
+    <link rel="icon" href="assets/icon-32.png" sizes="32x32">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="popup-body">
+    <main class="popup-shell">
+      <div class="usa-stripe" aria-hidden="true"></div>
+      <section class="popup-head">
+        <div class="mini-mark" aria-hidden="true"></div>
+        <div>
+          <h1>Wrench<span>Atlas</span></h1>
+          <p id="popupEdition">American Field Edition · v1.5</p>
+        </div>
+      </section>
+      <form class="popup-vin" id="popupVinForm">
+        <label for="popupVinInput" id="popupIdentifierLabel">Vehicle identifier</label>
+        <input id="popupVinInput" placeholder="Enter identifier" autocomplete="off" spellcheck="false">
+        <button id="popupLookupButton" type="submit">Check</button>
+      </form>
+      <section class="popup-result" id="popupResult">
+        <strong>Ready</strong>
+        <span id="popupReadyText">Check an identifier or load the industry demo.</span>
+      </section>
+      <button class="primary-wide demo-wide" id="openIndustryDemo" type="button">Load industry demo</button>
+      <button class="primary-wide" id="openWorkspace" type="button">Open workspace</button>
+      <p class="popup-foot" id="popupFoot">Free American open source. No ads. Local saves.</p>
+    </main>
+    <script src="variant.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
