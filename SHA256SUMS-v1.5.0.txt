@@ -1,2 +1,0 @@
-9394780bfda39824115b0bbb33a2dec6808b1da690b05fc0beaa11f3521b72a8  diesel-atlas-chrome-extension-v1.5.0.zip
-e40d0b33f2d3f0b194ff02b0ce43788aeb6e37941fc16f5cec2c5ca1d90d0398  diesel-atlas-marketing-assets-v1.5.0.zip

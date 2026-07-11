@@ -102,12 +102,6 @@ window.WA_DATA = {
                   "url": ""
                 },
                 {
-                  "title": "NHTSA vPIC API",
-                  "scope": "VIN identity data only",
-                  "confidence": "Official public vehicle identity source when a VIN is decoded",
-                  "url": "https://vpic.nhtsa.dot.gov/api/"
-                },
-                {
                   "title": "Community source requirement",
                   "scope": "Imported data packs",
                   "confidence": "Not accepted as verified unless source notes are present",
@@ -129,13 +123,13 @@ window.WA_DATA = {
                 "measurementNotes": [
                   "Torque conversions use 1 ft-lb = 1.355817948 N-m and are rounded to the nearest whole N-m.",
                   "Socket and wrench sizes describe common fastener heads for the selected reference, not a guarantee for every trim or prior repair.",
-                  "VIN decoding identifies vehicle metadata; it does not prove installed component, trim, or fastener variations.",
+                  "Equipment identifiers organize reference records; they do not prove the installed component, configuration, or fastener variation.",
                   "Air pressure, pushrod travel, lining thickness, drum/rotor limits, and brake balance require calibrated measurement against the exact system standard."
                 ],
                 "limitations": [
                   "No copied OEM/manufacturer schematics are included.",
                   "Wear limits, fluids, bleed order, torque sequence, and regulated procedures must come from official service information.",
-                  "Previously repaired vehicles may have non-original fasteners.",
+                  "Previously repaired equipment may have non-original fasteners.",
                   "Brake chamber type, axle family, automatic slack adjuster design, wheel end, and fleet configuration vary substantially.",
                   "This pack does not authorize chamber disassembly, annual inspection sign-off, or return to commercial service."
                 ]
@@ -266,12 +260,6 @@ window.WA_DATA = {
                   "url": ""
                 },
                 {
-                  "title": "NHTSA vPIC API",
-                  "scope": "VIN identity data only",
-                  "confidence": "Official public vehicle identity source when a VIN is decoded",
-                  "url": "https://vpic.nhtsa.dot.gov/api/"
-                },
-                {
                   "title": "Community source requirement",
                   "scope": "Imported data packs",
                   "confidence": "Not accepted as verified unless source notes are present",
@@ -286,25 +274,25 @@ window.WA_DATA = {
                 "measurementNotes": [
                   "Torque conversions use 1 ft-lb = 1.355817948 N-m and are rounded to the nearest whole N-m.",
                   "Socket and wrench sizes describe common fastener heads for the selected reference, not a guarantee for every trim or prior repair.",
-                  "VIN decoding identifies vehicle metadata; it does not prove installed component, trim, or fastener variations."
+                  "Equipment identifiers organize reference records; they do not prove the installed component, configuration, or fastener variation."
                 ],
                 "limitations": [
                   "No copied OEM/manufacturer schematics are included.",
                   "Wear limits, fluids, bleed order, torque sequence, and regulated procedures must come from official service information.",
-                  "Previously repaired vehicles may have non-original fasteners."
+                  "Previously repaired equipment may have non-original fasteners."
                 ]
               },
               "safety": [
-                "Confirm the exact vehicle, installed component, and official procedure before safety-critical work.",
-                "Work on a stable surface with rated supports, wheel chocks, eye protection, and appropriate gloves.",
-                "Stop if the vehicle configuration, fastener, measurement, or service value does not match the reference pack."
+                "Confirm the exact equipment identity, installed component, work environment, and official procedure before safety-critical work.",
+                "Secure the equipment against movement and stored energy; use rated supports and the protective equipment required for the task.",
+                "Stop if the installed configuration, fastener, measurement, or service value does not match the reference pack."
               ],
               "workflow": [
                 {
                   "id": "identify",
                   "title": "1. Identify",
                   "items": [
-                    "Confirm VIN, year, make, model, engine, drivetrain, and installed component.",
+                    "Confirm the equipment identity, model, serial or unit number, and installed component.",
                     "Review the evidence level, limitations, and official service source before disassembly."
                   ]
                 },
@@ -433,12 +421,6 @@ window.WA_DATA = {
                   "url": ""
                 },
                 {
-                  "title": "NHTSA vPIC API",
-                  "scope": "VIN identity data only",
-                  "confidence": "Official public vehicle identity source when a VIN is decoded",
-                  "url": "https://vpic.nhtsa.dot.gov/api/"
-                },
-                {
                   "title": "Community source requirement",
                   "scope": "Imported data packs",
                   "confidence": "Not accepted as verified unless source notes are present",
@@ -460,13 +442,13 @@ window.WA_DATA = {
                 "measurementNotes": [
                   "Torque conversions use 1 ft-lb = 1.355817948 N-m and are rounded to the nearest whole N-m.",
                   "Socket and wrench sizes describe common fastener heads for the selected reference, not a guarantee for every trim or prior repair.",
-                  "VIN decoding identifies vehicle metadata; it does not prove installed component, trim, or fastener variations.",
+                  "Equipment identifiers organize reference records; they do not prove the installed component, configuration, or fastener variation.",
                   "Air pressure, pushrod travel, lining thickness, drum/rotor limits, and brake balance require calibrated measurement against the exact system standard."
                 ],
                 "limitations": [
                   "No copied OEM/manufacturer schematics are included.",
                   "Wear limits, fluids, bleed order, torque sequence, and regulated procedures must come from official service information.",
-                  "Previously repaired vehicles may have non-original fasteners.",
+                  "Previously repaired equipment may have non-original fasteners.",
                   "Brake chamber type, axle family, automatic slack adjuster design, wheel end, and fleet configuration vary substantially.",
                   "This pack does not authorize chamber disassembly, annual inspection sign-off, or return to commercial service."
                 ]
@@ -597,12 +579,6 @@ window.WA_DATA = {
                   "url": ""
                 },
                 {
-                  "title": "NHTSA vPIC API",
-                  "scope": "VIN identity data only",
-                  "confidence": "Official public vehicle identity source when a VIN is decoded",
-                  "url": "https://vpic.nhtsa.dot.gov/api/"
-                },
-                {
                   "title": "Community source requirement",
                   "scope": "Imported data packs",
                   "confidence": "Not accepted as verified unless source notes are present",
@@ -617,25 +593,25 @@ window.WA_DATA = {
                 "measurementNotes": [
                   "Torque conversions use 1 ft-lb = 1.355817948 N-m and are rounded to the nearest whole N-m.",
                   "Socket and wrench sizes describe common fastener heads for the selected reference, not a guarantee for every trim or prior repair.",
-                  "VIN decoding identifies vehicle metadata; it does not prove installed component, trim, or fastener variations."
+                  "Equipment identifiers organize reference records; they do not prove the installed component, configuration, or fastener variation."
                 ],
                 "limitations": [
                   "No copied OEM/manufacturer schematics are included.",
                   "Wear limits, fluids, bleed order, torque sequence, and regulated procedures must come from official service information.",
-                  "Previously repaired vehicles may have non-original fasteners."
+                  "Previously repaired equipment may have non-original fasteners."
                 ]
               },
               "safety": [
-                "Confirm the exact vehicle, installed component, and official procedure before safety-critical work.",
-                "Work on a stable surface with rated supports, wheel chocks, eye protection, and appropriate gloves.",
-                "Stop if the vehicle configuration, fastener, measurement, or service value does not match the reference pack."
+                "Confirm the exact equipment identity, installed component, work environment, and official procedure before safety-critical work.",
+                "Secure the equipment against movement and stored energy; use rated supports and the protective equipment required for the task.",
+                "Stop if the installed configuration, fastener, measurement, or service value does not match the reference pack."
               ],
               "workflow": [
                 {
                   "id": "identify",
                   "title": "1. Identify",
                   "items": [
-                    "Confirm VIN, year, make, model, engine, drivetrain, and installed component.",
+                    "Confirm the equipment identity, model, serial or unit number, and installed component.",
                     "Review the evidence level, limitations, and official service source before disassembly."
                   ]
                 },
@@ -767,12 +743,6 @@ window.WA_DATA = {
                   "url": ""
                 },
                 {
-                  "title": "NHTSA vPIC API",
-                  "scope": "VIN identity data only",
-                  "confidence": "Official public vehicle identity source when a VIN is decoded",
-                  "url": "https://vpic.nhtsa.dot.gov/api/"
-                },
-                {
                   "title": "Community source requirement",
                   "scope": "Imported data packs",
                   "confidence": "Not accepted as verified unless source notes are present",
@@ -787,25 +757,25 @@ window.WA_DATA = {
                 "measurementNotes": [
                   "Torque conversions use 1 ft-lb = 1.355817948 N-m and are rounded to the nearest whole N-m.",
                   "Socket and wrench sizes describe common fastener heads for the selected reference, not a guarantee for every trim or prior repair.",
-                  "VIN decoding identifies vehicle metadata; it does not prove installed component, trim, or fastener variations."
+                  "Equipment identifiers organize reference records; they do not prove the installed component, configuration, or fastener variation."
                 ],
                 "limitations": [
                   "No copied OEM/manufacturer schematics are included.",
                   "Wear limits, fluids, bleed order, torque sequence, and regulated procedures must come from official service information.",
-                  "Previously repaired vehicles may have non-original fasteners."
+                  "Previously repaired equipment may have non-original fasteners."
                 ]
               },
               "safety": [
-                "Confirm the exact vehicle, installed component, and official procedure before safety-critical work.",
-                "Work on a stable surface with rated supports, wheel chocks, eye protection, and appropriate gloves.",
-                "Stop if the vehicle configuration, fastener, measurement, or service value does not match the reference pack."
+                "Confirm the exact equipment identity, installed component, work environment, and official procedure before safety-critical work.",
+                "Secure the equipment against movement and stored energy; use rated supports and the protective equipment required for the task.",
+                "Stop if the installed configuration, fastener, measurement, or service value does not match the reference pack."
               ],
               "workflow": [
                 {
                   "id": "identify",
                   "title": "1. Identify",
                   "items": [
-                    "Confirm VIN, year, make, model, engine, drivetrain, and installed component.",
+                    "Confirm the equipment identity, model, serial or unit number, and installed component.",
                     "Review the evidence level, limitations, and official service source before disassembly."
                   ]
                 },
@@ -845,14 +815,7 @@ window.WA_DATA = {
     "nhtsa": "https://vpic.nhtsa.dot.gov/api/",
     "policy": "https://developer.chrome.com/docs/webstore/program-policies/policies",
     "freedomToFix": "https://www.whitehouse.gov/presidential-actions/2026/06/lowering-the-cost-of-living-by-promoting-the-freedom-to-fix/",
-    "warranty": "https://consumer.ftc.gov/articles/auto-warranties-and-auto-service-contracts",
     "vehicleSoftwareRepair": "https://www.copyright.gov/title37/201/37cfr201-40.html",
-    "commercialBrakes": "https://www.ecfr.gov/current/title-49/part-393/subpart-C",
-    "hullIdentification": "https://www.ecfr.gov/current/title-33/part-181/subpart-C",
-    "aircraftMaintenanceAuthority": "https://www.ecfr.gov/current/title-14/part-43/section-43.3",
-    "aircraftPreventiveMaintenance": "https://www.ecfr.gov/current/title-14/part-43/appendix-Appendix%20A%20to%20Part%2043",
-    "locomotiveSafety": "https://www.ecfr.gov/current/title-49/part-229",
-    "freightBrakes": "https://www.ecfr.gov/current/title-49/part-232",
-    "blueSignalProtection": "https://www.ecfr.gov/current/title-49/part-218/subpart-B"
+    "commercialBrakes": "https://www.ecfr.gov/current/title-49/part-393/subpart-C"
   }
 };

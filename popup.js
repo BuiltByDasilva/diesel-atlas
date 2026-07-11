@@ -1,6 +1,7 @@
 (function () {
   const variant = window.WA_VARIANT || {
-    name: "WrenchAtlas",
+    name: "Lil Mechanic's: WrenchAtlas",
+    familyPrefix: "Lil Mechanic's:",
     brandPrefix: "Wrench",
     brandAccent: "Atlas",
     mode: "all"
@@ -53,6 +54,17 @@
   const lookupButton = document.getElementById("popupLookupButton");
   const edition = document.getElementById("popupEdition");
   const readyText = document.getElementById("popupReadyText");
+  const wrenchieButton = document.getElementById("popupWrenchieButton");
+  const wrenchieGuide = document.getElementById("popupWrenchieGuide");
+  const wrenchieMessage = document.getElementById("popupWrenchieMessage");
+  let wrenchieTipIndex = 0;
+  const wrenchieTips = [
+    "Start with the exact equipment identity, then stage the job.",
+    "Verify installed hardware before trusting a socket size or service value.",
+    "Read every safety gate before the first fastener moves.",
+    "Use current official service data for critical procedures and return to service.",
+    "Finish function checks, inspection, and documentation before release."
+  ];
 
   function setResult(title, detail) {
     result.textContent = "";
@@ -64,20 +76,44 @@
   }
 
   document.body.dataset.industry = profile.industry;
-  document.title = variant.name || "WrenchAtlas";
+  document.title = variant.name || "Lil Mechanic's: WrenchAtlas";
   document.querySelectorAll(".popup-head h1").forEach((heading) => {
     heading.textContent = "";
-    heading.append(document.createTextNode(variant.brandPrefix || "Wrench"));
+    heading.setAttribute("aria-label", variant.name || "Lil Mechanic's: WrenchAtlas");
+    const family = document.createElement("span");
+    family.className = "family-prefix";
+    family.textContent = variant.familyPrefix || "Lil Mechanic's:";
+    const product = document.createElement("span");
+    product.className = "product-name";
+    product.append(document.createTextNode(variant.brandPrefix || "Wrench"));
     const accent = document.createElement("span");
     accent.textContent = variant.brandAccent || "Atlas";
-    heading.appendChild(accent);
+    product.appendChild(accent);
+    heading.append(family, product);
   });
-  edition.textContent = `${profile.edition} · v1.5`;
+  edition.textContent = `${profile.edition} · v2.0`;
   identifierLabel.textContent = profile.identifier.label;
   input.placeholder = profile.identifier.placeholder;
   lookupButton.textContent = profile.identifier.action;
   readyText.textContent = `${profile.identifier.action} an identifier or load the industry demo.`;
   openIndustryDemo.textContent = profile.demo.label;
+
+  function animateWrenchie() {
+    [wrenchieButton, wrenchieGuide].filter(Boolean).forEach((element) => {
+      element.classList.remove("wrenchie-wave");
+      void element.offsetWidth;
+      element.classList.add("wrenchie-wave");
+    });
+  }
+
+  function nextWrenchieTip() {
+    wrenchieTipIndex = (wrenchieTipIndex + 1) % wrenchieTips.length;
+    wrenchieMessage.textContent = wrenchieTips[wrenchieTipIndex];
+    animateWrenchie();
+  }
+
+  wrenchieButton.addEventListener("click", nextWrenchieTip);
+  wrenchieGuide.addEventListener("click", nextWrenchieTip);
 
   function saveWorkspaceState(patch) {
     return new Promise((resolve) => {
@@ -157,6 +193,7 @@
     try {
       const decoded = await lookupIdentifier(input.value);
       setResult(decoded.label || decoded.vin, decoded.meta || "Identifier checked");
+      wrenchieMessage.textContent = "Identity checked. Open the workspace and let me stage the tools, safety gates, and closeout sequence.";
       await saveWorkspaceState({
         decodedVin: {
           vin: decoded.vin,
@@ -168,6 +205,7 @@
       });
     } catch (error) {
       setResult("Check failed", error.message);
+      wrenchieMessage.textContent = "Check the identifier format and try again. I will not guess at equipment identity.";
     } finally {
       lookupButton.disabled = false;
       lookupButton.textContent = profile.identifier.action;

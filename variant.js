@@ -1,6 +1,7 @@
 window.WA_VARIANT = {
   "id": "diesel-atlas",
-  "name": "DieselAtlas: Truck Repair Planner",
+  "name": "Lil Mechanic's: DieselAtlas",
+  "familyPrefix": "Lil Mechanic's:",
   "brandPrefix": "Diesel",
   "brandAccent": "Atlas",
   "mode": "truck",

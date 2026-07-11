@@ -2,12 +2,12 @@
   "manifest_version": 3,
   "name": "__MSG_extName__",
   "short_name": "__MSG_extShortName__",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "description": "__MSG_extDescription__",
   "default_locale": "en",
   "homepage_url": "https://JerseyPublishers.com",
   "action": {
-    "default_title": "DieselAtlas",
+    "default_title": "Lil Mechanic's: DieselAtlas",
     "default_popup": "popup.html"
   },
   "background": {
@@ -24,6 +24,9 @@
     "storage"
   ],
   "host_permissions": [
-    "https://vpic.nhtsa.dot.gov/*"
+    "https://www.federalregister.gov/*",
+    "https://www.congress.gov/*",
+    "https://vpic.nhtsa.dot.gov/*",
+    "https://api.nhtsa.gov/*"
   ]
 }

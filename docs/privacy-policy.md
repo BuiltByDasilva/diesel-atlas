@@ -1,29 +1,29 @@
-# DieselAtlas Privacy Policy
+# Lil Mechanic's: DieselAtlas Privacy Policy
 
-Effective and last updated: July 9, 2026
+Effective and last updated: July 10, 2026
 
-DieselAtlas version 1.5.0 is a free, open-source Chrome extension published by JerseyPublishers at JerseyPublishers.com. This policy covers the DieselAtlas extension only.
+Lil Mechanic's: DieselAtlas version 2.0.0 is a free, open-source Chrome extension published by JerseyPublishers at JerseyPublishers.com. This policy covers the DieselAtlas extension only.
 
 ## Summary
 
 - No account, ads, analytics, sale of data, profiling, affiliate tracking, subscription, or payment processing.
 - No browsing-history, webpage-content, location, contacts, credentials, financial, health, or communications collection.
 - Repair selections, checks, notes, preferences, and imported open-data packs are stored locally in the user's Chrome profile.
-- When the user presses Decode, DieselAtlas sends the entered VIN to the official NHTSA vPIC HTTPS API. NHTSA processes the request under its own terms and privacy practices. The app does not send notes, checks, imported packs, or browsing data with that request.
+- When the user presses Decode, DieselAtlas sends the entered VIN to the official NHTSA vPIC HTTPS API. NHTSA processes the request under its own terms and privacy practices. The app does not send notes, checks, imported packs, or browsing data with that request. For model-level recall context, Wrenchie sends the selected year, make, and model, but not the VIN, to the official NHTSA Recalls API. Wrenchie automatically retrieves public transportation rulemaking from the Federal Register API and the Bills Presented to the President RSS feed from Congress.gov when its cache is missing or stale and when the user refreshes. The app sends no account, notes, imported packs, browsing data, or precise location with those public-source requests.
 
 ## Information The Extension Handles
 
-The user may enter a 17-character truck VIN, choose equipment and a maintenance reference, check tools or workflow steps, write local job notes, save equipment identity, and import a compatible JSON data pack. These actions exist only to provide the extension's disclosed repair-planning purpose.
+The user may enter a 17-character truck VIN, choose equipment and a maintenance reference, check tools or workflow steps, write local job notes, save equipment identity, import a compatible JSON data pack, search Wrenchie, and save a source brief. These actions exist only to provide the extension's disclosed repair-planning and transportation-safety purpose.
 
 ## Network Requests
 
-When the user presses Decode, DieselAtlas sends the entered VIN to the official NHTSA vPIC HTTPS API. NHTSA processes the request under its own terms and privacy practices. The app does not send notes, checks, imported packs, or browsing data with that request.
+When the user presses Decode, DieselAtlas sends the entered VIN to the official NHTSA vPIC HTTPS API. NHTSA processes the request under its own terms and privacy practices. The app does not send notes, checks, imported packs, or browsing data with that request. For model-level recall context, Wrenchie sends the selected year, make, and model, but not the VIN, to the official NHTSA Recalls API. Wrenchie automatically retrieves public transportation rulemaking from the Federal Register API and the Bills Presented to the President RSS feed from Congress.gov when its cache is missing or stale and when the user refreshes. The app sends no account, notes, imported packs, browsing data, or precise location with those public-source requests.
 
 Direct HTTPS links to primary sources open only after the user chooses them. Loading those external pages is governed by the destination site's privacy policy and the user's browser settings.
 
 ## Local Storage And Retention
 
-The extension uses Chrome's `storage` permission for selected equipment, job progress, repair notes, preferences, saved identifiers, and imported data packs. JerseyPublishers does not receive or operate a server copy of that local data. It remains until the user resets it, clears extension storage, removes the extension, or Chrome removes the profile data.
+The extension uses Chrome's `storage` permission for selected equipment, job progress, repair notes, preferences, saved identifiers, imported data packs, Wrenchie feed cache, and saved briefs. JerseyPublishers does not receive or operate a server copy of that local data. It remains until the user resets it, clears extension storage, removes the extension, or Chrome removes the profile data.
 
 ## Sharing And Sale
 
@@ -54,4 +54,4 @@ Material policy changes will be dated here and reflected in the Chrome Web Store
 - Publisher: JerseyPublishers
 - Website and support: https://JerseyPublishers.com
 - Source code: https://github.com/BuiltByDasilva/diesel-atlas
-- Product: DieselAtlas 1.5.0
+- Product: Lil Mechanic's: DieselAtlas 2.0.0

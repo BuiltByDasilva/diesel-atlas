@@ -1,8 +1,17 @@
 (function () {
   const data = window.WA_DATA;
+  const wrenchieKnowledge = window.WRENCHIE_KNOWLEDGE || {
+    identity: { promise: "Source first. Status clear. Jurisdiction visible.", boundary: "Educational information only." },
+    agencyScopes: {},
+    transportKeywords: [],
+    lessons: []
+  };
+  const WRENCHIE_CACHE_TTL = 4 * 60 * 60 * 1000;
+  let wrenchieRefreshTimer = null;
   const variant = window.WA_VARIANT || {
     id: "wrenchatlas",
-    name: "WrenchAtlas",
+    name: "Lil Mechanic's: WrenchAtlas",
+    familyPrefix: "Lil Mechanic's:",
     brandPrefix: "Wrench",
     brandAccent: "Atlas",
     mode: "all",
@@ -13,8 +22,8 @@
     all: {
       industry: "car",
       edition: "American Garage Edition",
-      mascot: "Liberty Torque Compass",
-      mascotTagline: "Know the job. Own the repair.",
+      mascot: "Mr. Wrenchie",
+      mascotTagline: "Tap me for the next smart move.",
       workspace: "Vehicle workspace",
       statusTitle: "Built for American repair freedom",
       statusText: "Free, open source, ad-free, and locally saved.",
@@ -38,7 +47,7 @@
     car: {
       industry: "car",
       edition: "American Garage Edition",
-      mascot: "Liberty Torque Compass",
+      mascot: "Mr. Wrenchie",
       mascotTagline: "Know the car. Own the repair.",
       workspace: "Car workspace",
       statusTitle: "Car repair freedom, evidence first",
@@ -52,7 +61,7 @@
     truck: {
       industry: "truck",
       edition: "American Fleet Edition",
-      mascot: "Load Star",
+      mascot: "Mr. Wrenchie",
       mascotTagline: "Stage the work. Protect the route.",
       workspace: "Truck workspace",
       statusTitle: "Built for America's working fleets",
@@ -77,7 +86,7 @@
     boat: {
       industry: "boat",
       edition: "American Dockside Edition",
-      mascot: "Tide Sextant",
+      mascot: "Mr. Wrenchie",
       mascotTagline: "Identify. Service. Return seaworthy.",
       workspace: "Vessel workspace",
       statusTitle: "Open maintenance for American boaters",
@@ -102,7 +111,7 @@
     plane: {
       industry: "plane",
       edition: "American Hangar Edition",
-      mascot: "Safety Gyro",
+      mascot: "Mr. Wrenchie",
       mascotTagline: "Know the authority. Protect airworthiness.",
       workspace: "Aircraft workspace",
       statusTitle: "Open references within FAA authority",
@@ -127,7 +136,7 @@
     train: {
       industry: "train",
       edition: "American Rail Edition",
-      mascot: "Signal Gauge",
+      mascot: "Mr. Wrenchie",
       mascotTagline: "Protect the track. Verify the release.",
       workspace: "Locomotive workspace",
       statusTitle: "Open references for America's rail workforce",
@@ -167,7 +176,16 @@
     savedVehicles: [],
     communityVehicles: [],
     taskChecks: {},
-    repairNotes: {}
+    repairNotes: {},
+    wrenchieView: "live",
+    wrenchieFilter: "all",
+    wrenchieQuery: "",
+    wrenchieSelectedId: "",
+    wrenchieCache: null,
+    wrenchieSavedItems: [],
+    wrenchieLoading: false,
+    wrenchieMessage: "",
+    wrenchieCoachTipIndex: -1
   };
 
   const ids = [
@@ -227,7 +245,23 @@
     "rightsGrid",
     "affiliationNote",
     "opensourceTitle",
-    "opensourceText"
+    "opensourceText",
+    "mascotGuideButton",
+    "wrenchieCoachMascot",
+    "wrenchieCoachTitle",
+    "wrenchieCoachMessage",
+    "wrenchieDeskMascotButton",
+    "wrenchiePromise",
+    "wrenchieSourceHealth",
+    "wrenchieLastUpdated",
+    "wrenchieRefreshButton",
+    "wrenchieSearchForm",
+    "wrenchieSearchInput",
+    "wrenchieFilterRow",
+    "wrenchieStatus",
+    "wrenchieFeedList",
+    "wrenchieBrief",
+    "wrenchieBoundary"
   ];
 
   ids.forEach((id) => {
@@ -416,6 +450,20 @@
     })));
   }
 
+  function toolTasks() {
+    const tools = currentProcedure().tools || {};
+    return ["sockets", "wrenches", "specialty"].flatMap((group) => (
+      Array.isArray(tools[group]) ? tools[group] : []
+    ).map((item, index) => ({
+      key: taskKey(group, index),
+      label: String(item)
+    })));
+  }
+
+  function missionTasks() {
+    return toolTasks().concat(workflowTasks());
+  }
+
   function renderToolChecklist(items, group) {
     return (Array.isArray(items) ? items : []).map((item, index) => {
       const key = taskKey(group, index);
@@ -427,7 +475,9 @@
     root.querySelectorAll("[data-task-key]").forEach((input) => {
       input.addEventListener("change", () => {
         state.taskChecks[input.dataset.taskKey] = input.checked;
+        state.wrenchieCoachTipIndex = -1;
         renderMission();
+        renderWrenchieCoach();
         persistWorkspace();
       });
     });
@@ -437,7 +487,7 @@
     const vehicle = currentVehicle();
     const system = currentSystem();
     const procedure = currentProcedure();
-    const tasks = workflowTasks();
+    const tasks = missionTasks();
     const complete = tasks.filter((task) => state.taskChecks[task.key]).length;
     const percent = tasks.length ? Math.round((complete / tasks.length) * 100) : 0;
 
@@ -494,6 +544,7 @@
     state.zoom = 1;
     render();
     persistWorkspace();
+    queueWrenchieRefresh();
     const target = document.getElementById("mission");
     if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -507,6 +558,7 @@
     renderMission();
     renderWorkflow();
     renderTools();
+    renderWrenchieCoach();
     persistWorkspace();
   }
 
@@ -536,6 +588,7 @@
         syncSelectionDefaults();
         render();
         persistWorkspace();
+        queueWrenchieRefresh();
       });
       els.modeStrip.appendChild(button);
     });
@@ -614,14 +667,20 @@
 
   function renderBrand() {
     document.body.dataset.industry = profile.industry;
-    document.title = variant.name || "WrenchAtlas";
+    document.title = variant.name || "Lil Mechanic's: WrenchAtlas";
     document.querySelectorAll(".brand-lockup h1").forEach((heading) => {
       heading.textContent = "";
-      heading.append(document.createTextNode(variant.brandPrefix || "Wrench"));
-      if (variant.lockMode) heading.appendChild(document.createElement("br"));
+      heading.setAttribute("aria-label", variant.name || "Lil Mechanic's: WrenchAtlas");
+      const family = document.createElement("span");
+      family.className = "family-prefix";
+      family.textContent = variant.familyPrefix || "Lil Mechanic's:";
+      const product = document.createElement("span");
+      product.className = "product-name";
+      product.append(document.createTextNode(variant.brandPrefix || "Wrench"));
       const accent = document.createElement("span");
       accent.textContent = variant.brandAccent || "Atlas";
-      heading.appendChild(accent);
+      product.appendChild(accent);
+      heading.append(family, product);
     });
     els.editionLabel.textContent = `${profile.edition} · JerseyPublishers`;
     els.mascotName.textContent = profile.mascot;
@@ -637,11 +696,128 @@
     els.missionKicker.textContent = profile.missionKicker;
     els.missionStandardTitle.textContent = profile.standardTitle;
     els.missionStandardText.textContent = profile.standardText;
-    els.opensourceTitle.textContent = `${variant.brandPrefix || "Wrench"}${variant.brandAccent || "Atlas"} is free American open source`;
+    els.opensourceTitle.textContent = `${variant.name || "Lil Mechanic's: WrenchAtlas"} is free American open source`;
     els.opensourceText.textContent = "Industry-specific repair packs with visible evidence limits. Verify critical procedures with current official data.";
     document.querySelectorAll(".rail-footer span:first-child").forEach((label) => {
-      label.textContent = variant.name || "WrenchAtlas";
+      label.textContent = variant.name || "Lil Mechanic's: WrenchAtlas";
     });
+  }
+
+  function wrenchieCoachTips() {
+    const equipment = {
+      car: "car",
+      truck: "truck",
+      boat: "vessel",
+      plane: "aircraft",
+      train: "locomotive"
+    }[profile.industry] || "equipment";
+    return [
+      {
+        title: "Identity before tools.",
+        message: `Confirm the exact ${equipment}, installed configuration, and selected job before loosening a fastener.`
+      },
+      {
+        title: "Stage the full tool stack.",
+        message: "Lay out sockets, wrenches, specialty tools, measuring tools, and safety equipment before the first step."
+      },
+      {
+        title: "Treat every safety gate as a stop gate.",
+        message: "Stored energy, support, authority, inspection, and return-to-service checks are part of the repair, not optional reminders."
+      },
+      {
+        title: "Source labels matter.",
+        message: "Use the reference to orient the job, then verify critical values and procedures against current official service data."
+      },
+      {
+        title: "Close out before release.",
+        message: "Complete inspection, leak or function checks, documentation, and the applicable low-risk return-to-service process."
+      }
+    ];
+  }
+
+  function automaticWrenchieCoach() {
+    const vehicle = currentVehicle();
+    const procedure = currentProcedure();
+    const tasks = missionTasks();
+    const complete = tasks.filter((task) => state.taskChecks[task.key]).length;
+    const equipmentName = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
+
+    if (!state.decodedVin || state.decodedVin.vin === "Check failed") {
+      return {
+        title: `Confirm the ${profile.identifier.short} or load the demonstration.`,
+        message: `I have ${equipmentName} selected. Identification helps orient the job but never proves installed parts or service values.`
+      };
+    }
+    if (complete === 0) {
+      return {
+        title: `Stage every tool for ${procedure.name}.`,
+        message: "Open Tool stack, verify the installed hardware, and read the safety phase before the first fastener moves."
+      };
+    }
+    if (complete < tasks.length) {
+      return {
+        title: `${complete} of ${tasks.length} checks complete. Keep the sequence intact.`,
+        message: "Finish the current phase before moving on, and stop if the equipment differs from this evidence-labeled reference."
+      };
+    }
+    return {
+      title: "The checklist is complete. Verify release authority.",
+      message: "Review notes, inspection, function checks, documentation, and current official requirements before returning equipment to service."
+    };
+  }
+
+  function renderWrenchieCoach() {
+    if (!els.wrenchieCoachTitle || !els.wrenchieCoachMessage) return;
+    const tips = wrenchieCoachTips();
+    const guidance = state.wrenchieCoachTipIndex >= 0
+      ? tips[state.wrenchieCoachTipIndex % tips.length]
+      : automaticWrenchieCoach();
+    els.wrenchieCoachTitle.textContent = guidance.title;
+    els.wrenchieCoachMessage.textContent = guidance.message;
+  }
+
+  function animateWrenchie(element) {
+    if (!element) return;
+    element.classList.remove("wrenchie-wave");
+    void element.offsetWidth;
+    element.classList.add("wrenchie-wave");
+  }
+
+  function advanceWrenchieCoach(element) {
+    const tips = wrenchieCoachTips();
+    state.wrenchieCoachTipIndex = (state.wrenchieCoachTipIndex + 1 + tips.length) % tips.length;
+    renderWrenchieCoach();
+    animateWrenchie(element);
+  }
+
+  function jumpToSection(id, focusTarget) {
+    const target = document.getElementById(id);
+    if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (focusTarget) window.setTimeout(() => focusTarget.focus(), 420);
+  }
+
+  function runWrenchieCoachAction(action) {
+    state.wrenchieCoachTipIndex = -1;
+    if (action === "identify") {
+      jumpToSection("vin", els.vinInput);
+      return;
+    }
+    if (action === "tools") {
+      state.activeToolPanel = "tools";
+      renderToolTabs();
+      renderTools();
+      jumpToSection("systems");
+      return;
+    }
+    if (action === "safety") {
+      jumpToSection("workflow", document.querySelector(".safety-phase input"));
+      return;
+    }
+    state.wrenchieView = "learn";
+    state.wrenchieQuery = "";
+    els.wrenchieSearchInput.value = "";
+    renderWrenchie();
+    jumpToSection("wrenchie", els.wrenchieSearchInput);
   }
 
   function renderRights() {
@@ -933,9 +1109,491 @@
         state.make = saved.make || currentVehicle().make;
         syncSelectionDefaults();
         render();
+        persistWorkspace();
+        queueWrenchieRefresh();
       });
       els.savedList.appendChild(card);
     });
+  }
+
+  function wrenchieContextKey() {
+    const vehicle = currentVehicle();
+    return [state.mode, vehicle && vehicle.year, vehicle && vehicle.make, vehicle && vehicle.model].filter(Boolean).join(":");
+  }
+
+  function plainText(value) {
+    const documentValue = new DOMParser().parseFromString(String(value == null ? "" : value), "text/html");
+    return String(documentValue.body.textContent || "").replace(/\s+/g, " ").trim();
+  }
+
+  function clippedText(value, limit = 260) {
+    const text = plainText(value);
+    if (text.length <= limit) return text;
+    return `${text.slice(0, Math.max(0, limit - 1)).trim()}...`;
+  }
+
+  function readableAgencyText(value) {
+    const text = plainText(value);
+    const letters = text.replace(/[^A-Za-z]/g, "");
+    if (!letters || letters !== letters.toUpperCase()) return text;
+    const lower = text.toLowerCase();
+    return lower.charAt(0).toUpperCase() + lower.slice(1);
+  }
+
+  function formatWrenchieDate(value) {
+    if (!value) return "Date not listed";
+    const source = /^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T12:00:00` : value;
+    const date = new Date(source);
+    if (Number.isNaN(date.getTime())) return plainText(value);
+    return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(date);
+  }
+
+  function reportDateToIso(value) {
+    const match = String(value || "").match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    return match ? `${match[3]}-${match[2]}-${match[1]}` : String(value || "");
+  }
+
+  function wrenchieLessonItems() {
+    return (wrenchieKnowledge.lessons || [])
+      .filter((lesson) => {
+        const modes = Array.isArray(lesson.modes) ? lesson.modes : ["all"];
+        return state.mode === "all" ? modes.includes("all") : modes.includes(state.mode);
+      })
+      .map((lesson) => ({
+        id: `lesson:${lesson.id}`,
+        sourceType: "guidance",
+        status: lesson.status || "Safety guidance",
+        title: lesson.title,
+        summary: lesson.summary,
+        why: lesson.why,
+        next: lesson.next,
+        jurisdiction: lesson.jurisdiction,
+        sourceLabel: lesson.sourceLabel,
+        sourceUrl: lesson.sourceUrl,
+        date: "Reference lesson",
+        agency: lesson.sourceLabel,
+        keywords: lesson.keywords || []
+      }));
+  }
+
+  function wrenchieLiveItems() {
+    const cache = state.wrenchieCache;
+    if (!cache || cache.contextKey !== wrenchieContextKey() || !Array.isArray(cache.items)) return [];
+    return cache.items;
+  }
+
+  function allWrenchieItems() {
+    const items = wrenchieLiveItems().concat(wrenchieLessonItems(), state.wrenchieSavedItems || []);
+    const uniqueItems = new Map();
+    items.forEach((item) => {
+      if (item && item.id && !uniqueItems.has(item.id)) uniqueItems.set(item.id, item);
+    });
+    return Array.from(uniqueItems.values());
+  }
+
+  function wrenchieSearchScore(item, query) {
+    const tokens = String(query || "").toLowerCase().match(/[a-z0-9]+/g) || [];
+    if (!tokens.length) return 1;
+    const title = String(item.title || "").toLowerCase();
+    const status = String(item.status || "").toLowerCase();
+    const body = [item.summary, item.why, item.next, item.jurisdiction, item.agency, item.sourceLabel]
+      .concat(item.keywords || [])
+      .join(" ")
+      .toLowerCase();
+    return tokens.reduce((score, token) => {
+      if (title.includes(token)) return score + 5;
+      if (status.includes(token)) return score + 3;
+      if (body.includes(token)) return score + 1;
+      return score;
+    }, 0);
+  }
+
+  function visibleWrenchieItems() {
+    let items = [];
+    if (state.wrenchieView === "learn") items = wrenchieLessonItems();
+    else if (state.wrenchieView === "saved") items = state.wrenchieSavedItems || [];
+    else items = wrenchieLiveItems();
+
+    if (state.wrenchieView === "live" && state.wrenchieFilter !== "all") {
+      items = items.filter((item) => item.sourceType === state.wrenchieFilter);
+    }
+
+    if (state.wrenchieQuery) {
+      items = items
+        .map((item) => ({ item, score: wrenchieSearchScore(item, state.wrenchieQuery) }))
+        .filter((entry) => entry.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .map((entry) => entry.item);
+    }
+
+    return items;
+  }
+
+  function wrenchieStatusClass(status) {
+    const value = String(status || "").toLowerCase();
+    if (value.includes("recall")) return "danger";
+    if (value.includes("proposed") || value.includes("passed congress")) return "draft";
+    if (value.includes("rule") || value.includes("regulation")) return "active";
+    if (value.includes("guidance")) return "guide";
+    return "info";
+  }
+
+  function isWrenchieItemSaved(itemId) {
+    return (state.wrenchieSavedItems || []).some((item) => item.id === itemId);
+  }
+
+  function wrenchieItemById(itemId) {
+    return allWrenchieItems().find((item) => item.id === itemId) || null;
+  }
+
+  function selectedWrenchieItem(items = visibleWrenchieItems()) {
+    let item = items.find((entry) => entry.id === state.wrenchieSelectedId);
+    if (!item) item = items[0] || null;
+    if (item) state.wrenchieSelectedId = item.id;
+    return item;
+  }
+
+  function renderWrenchieFeed(items) {
+    els.wrenchieFeedList.textContent = "";
+    if (!items.length) {
+      const empty = document.createElement("div");
+      empty.className = "wrenchie-empty";
+      if (state.wrenchieLoading && state.wrenchieView === "live") {
+        empty.textContent = "Checking official transportation sources...";
+      } else if (state.wrenchieView === "saved") {
+        empty.textContent = "No saved Mr. Wrenchie briefs yet.";
+      } else if (state.wrenchieQuery) {
+        empty.textContent = "No source-backed item matches this search.";
+      } else if (state.wrenchieView === "live" && state.wrenchieCache && state.wrenchieCache.contextKey !== wrenchieContextKey()) {
+        empty.textContent = "Refreshing the desk for the selected equipment.";
+      } else {
+        empty.textContent = "No transportation items are available for this view.";
+      }
+      els.wrenchieFeedList.appendChild(empty);
+      return;
+    }
+
+    const selected = selectedWrenchieItem(items);
+    items.slice(0, 18).forEach((item) => {
+      const article = document.createElement("article");
+      article.className = item.id === selected.id ? "wrenchie-item selected" : "wrenchie-item";
+      article.dataset.itemId = item.id;
+      article.innerHTML = `
+        <button class="wrenchie-item-main" type="button" aria-label="Open ${escapeHtml(item.title)}">
+          <span class="wrenchie-item-topline">
+            <span class="wrenchie-badge ${wrenchieStatusClass(item.status)}">${escapeHtml(item.status)}</span>
+            <span>${escapeHtml(formatWrenchieDate(item.date))}</span>
+          </span>
+          <strong>${escapeHtml(item.title)}</strong>
+          <span class="wrenchie-item-summary">${escapeHtml(clippedText(item.summary, 190))}</span>
+          <small>${escapeHtml(item.agency || item.sourceLabel || "Official source")}</small>
+        </button>
+        <button class="wrenchie-save-button${isWrenchieItemSaved(item.id) ? " saved" : ""}" type="button" title="${isWrenchieItemSaved(item.id) ? "Remove saved brief" : "Save brief"}" aria-label="${isWrenchieItemSaved(item.id) ? "Remove saved brief" : "Save brief"}">
+          <span aria-hidden="true">${isWrenchieItemSaved(item.id) ? "★" : "☆"}</span>
+        </button>
+      `;
+      article.querySelector(".wrenchie-item-main").addEventListener("click", () => {
+        state.wrenchieSelectedId = item.id;
+        renderWrenchie();
+      });
+      article.querySelector(".wrenchie-save-button").addEventListener("click", () => toggleWrenchieSavedItem(item.id));
+      els.wrenchieFeedList.appendChild(article);
+    });
+  }
+
+  function renderWrenchieBrief(item) {
+    if (!item) {
+      els.wrenchieBrief.innerHTML = `
+        <div class="wrenchie-brief-mascot"><img src="assets/mr-wrenchie.png" alt=""><span class="wrenchie-brief-label">Mr. Wrenchie's brief</span></div>
+        <h3>No item selected</h3>
+        <p>Choose a source item or safety lesson to see its status, jurisdiction, practical meaning, and next verification step.</p>
+      `;
+      return;
+    }
+
+    const sourceUrl = safeExternalUrl(item.sourceUrl);
+    const officialUrl = safeExternalUrl(item.officialUrl);
+    const remedy = item.remedy ? `
+      <section>
+        <h4>Remedy or action</h4>
+        <p>${escapeHtml(clippedText(item.remedy, 520))}</p>
+      </section>
+    ` : "";
+    const sourceLinks = [
+      sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">Open source</a>` : "",
+      officialUrl ? `<a href="${escapeHtml(officialUrl)}" target="_blank" rel="noopener noreferrer">Official PDF</a>` : ""
+    ].filter(Boolean).join("");
+
+    els.wrenchieBrief.innerHTML = `
+      <div class="wrenchie-brief-heading">
+        <span class="wrenchie-brief-mascot"><img src="assets/mr-wrenchie.png" alt=""><span class="wrenchie-brief-label">Mr. Wrenchie's brief</span></span>
+        <span class="wrenchie-badge ${wrenchieStatusClass(item.status)}">${escapeHtml(item.status)}</span>
+      </div>
+      <h3>${escapeHtml(item.title)}</h3>
+      <dl class="wrenchie-facts">
+        <div><dt>Source</dt><dd>${escapeHtml(item.sourceLabel || item.agency || "Official source")}</dd></div>
+        <div><dt>Jurisdiction</dt><dd>${escapeHtml(item.jurisdiction || "Check source")}</dd></div>
+        <div><dt>Date</dt><dd>${escapeHtml(formatWrenchieDate(item.date))}</dd></div>
+      </dl>
+      <section>
+        <h4>What it says</h4>
+        <p>${escapeHtml(clippedText(item.summary, 700))}</p>
+      </section>
+      <section>
+        <h4>Why it matters</h4>
+        <p>${escapeHtml(clippedText(item.why, 620))}</p>
+      </section>
+      <section>
+        <h4>Verify next</h4>
+        <p>${escapeHtml(clippedText(item.next, 620))}</p>
+      </section>
+      ${remedy}
+      ${sourceLinks ? `<div class="wrenchie-source-links">${sourceLinks}</div>` : ""}
+    `;
+  }
+
+  function renderWrenchie() {
+    if (!els.wrenchieFeedList) return;
+    const items = visibleWrenchieItems();
+    const cache = state.wrenchieCache;
+    const sources = cache && cache.contextKey === wrenchieContextKey() && Array.isArray(cache.sources) ? cache.sources : [];
+    const online = sources.filter((source) => source.ok).length;
+
+    els.wrenchiePromise.textContent = wrenchieKnowledge.identity.promise;
+    els.wrenchieBoundary.textContent = wrenchieKnowledge.identity.boundary;
+    els.wrenchieFilterRow.hidden = state.wrenchieView !== "live";
+    els.wrenchieRefreshButton.disabled = state.wrenchieLoading;
+    els.wrenchieRefreshButton.innerHTML = state.wrenchieLoading
+      ? '<span aria-hidden="true">↻</span> Updating'
+      : '<span aria-hidden="true">↻</span> Refresh';
+    els.wrenchieSourceHealth.textContent = sources.length ? `${online} of ${sources.length} official sources available` : "Official source cache";
+    els.wrenchieLastUpdated.textContent = cache && cache.contextKey === wrenchieContextKey()
+      ? `Updated ${new Date(cache.updatedAt).toLocaleString()}`
+      : "Waiting for current equipment refresh";
+    els.wrenchieStatus.textContent = state.wrenchieMessage || (
+      state.wrenchieView === "learn"
+        ? `${items.length} source-backed safety and legal-literacy lessons`
+        : state.wrenchieView === "saved"
+          ? `${items.length} saved briefs stored in this browser`
+          : `${items.length} current items for ${state.mode === "all" ? "transportation" : state.mode}`
+    );
+
+    document.querySelectorAll("[data-wrenchie-view]").forEach((button) => {
+      const active = button.dataset.wrenchieView === state.wrenchieView;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-selected", String(active));
+    });
+    document.querySelectorAll("[data-wrenchie-filter]").forEach((button) => {
+      button.classList.toggle("active", button.dataset.wrenchieFilter === state.wrenchieFilter);
+    });
+
+    renderWrenchieFeed(items);
+    renderWrenchieBrief(selectedWrenchieItem(items));
+  }
+
+  async function toggleWrenchieSavedItem(itemId) {
+    const index = state.wrenchieSavedItems.findIndex((item) => item.id === itemId);
+    if (index >= 0) {
+      state.wrenchieSavedItems.splice(index, 1);
+    } else {
+      const item = wrenchieItemById(itemId);
+      if (item) state.wrenchieSavedItems.unshift(Object.assign({}, item, { savedAt: new Date().toISOString() }));
+    }
+    await storageSet({ wrenchieSavedItems: state.wrenchieSavedItems });
+    renderWrenchie();
+  }
+
+  async function fetchWithTimeout(url, options = {}, timeout = 14000) {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), timeout);
+    try {
+      const response = await fetch(url, Object.assign({}, options, { signal: controller.signal }));
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response;
+    } finally {
+      window.clearTimeout(timer);
+    }
+  }
+
+  function federalRegisterMeaning(type) {
+    if (type === "Proposed Rule") {
+      return {
+        status: "Proposed rule",
+        why: "This is a proposal for public participation, not a final requirement.",
+        next: "Check the comment deadline, docket, later final rule, effective date, and current CFR text before treating it as binding."
+      };
+    }
+    if (type === "Rule") {
+      return {
+        status: "Final rule",
+        why: "The agency published adopted regulatory action, but applicability and timing still depend on the document.",
+        next: "Verify the official PDF, effective and compliance dates, affected CFR sections, corrections, stays, and current eCFR text."
+      };
+    }
+    return {
+      status: type === "Notice" ? "Agency notice" : (type || "Agency document"),
+      why: "An agency notice can announce a proceeding, request, decision, meeting, data collection, or other action; it is not automatically a new rule.",
+      next: "Read the scope, dates, docket, legal authority, and any linked final action before drawing a compliance conclusion."
+    };
+  }
+
+  async function fetchFederalRegisterItems() {
+    const scopes = wrenchieKnowledge.agencyScopes[state.mode] || wrenchieKnowledge.agencyScopes.all || [];
+    const params = new URLSearchParams({ per_page: "12", order: "newest" });
+    scopes.forEach((agency) => params.append("conditions[agencies][]", agency.slug));
+    const response = await fetchWithTimeout(`https://www.federalregister.gov/api/v1/documents.json?${params.toString()}`);
+    const body = await response.json();
+    return (body.results || []).map((entry) => {
+      const meaning = federalRegisterMeaning(entry.type);
+      const agencies = (entry.agencies || []).filter((agency) => agency.name !== "Transportation Department");
+      const agency = agencies.map((item) => item.name).join(", ") || "Federal Register";
+      return {
+        id: `federal-register:${entry.document_number}`,
+        sourceType: "rules",
+        status: meaning.status,
+        title: entry.title || "Federal Register document",
+        summary: entry.abstract || entry.excerpts || "Open the source for the published summary.",
+        why: meaning.why,
+        next: meaning.next,
+        jurisdiction: "United States federal",
+        sourceLabel: `Federal Register ${entry.document_number || "document"}`,
+        sourceUrl: entry.html_url,
+        officialUrl: entry.pdf_url,
+        date: entry.publication_date,
+        agency
+      };
+    });
+  }
+
+  async function fetchCongressItems() {
+    const response = await fetchWithTimeout("https://www.congress.gov/rss/presented-to-president.xml");
+    const xml = new DOMParser().parseFromString(await response.text(), "application/xml");
+    if (xml.querySelector("parsererror")) throw new Error("Congress.gov returned invalid RSS");
+    const channelDate = xml.querySelector("channel > pubDate")?.textContent || "";
+    const keywords = wrenchieKnowledge.transportKeywords || [];
+    return Array.from(xml.querySelectorAll("channel > item")).map((entry) => {
+      const bill = plainText(entry.querySelector("title")?.textContent);
+      const description = plainText(entry.querySelector("description")?.textContent);
+      const link = plainText(entry.querySelector("link")?.textContent);
+      return { bill, description, link };
+    }).filter((entry) => {
+      const haystack = `${entry.bill} ${entry.description}`.toLowerCase();
+      return keywords.some((keyword) => haystack.includes(String(keyword).toLowerCase()));
+    }).map((entry) => ({
+      id: `congress:${entry.bill}`,
+      sourceType: "legislation",
+      status: "Passed Congress",
+      title: `${entry.bill}: ${entry.description || "Legislation presented to the President"}`,
+      summary: "Congress.gov lists this measure as passed by both chambers and presented to the President.",
+      why: "Presentation is a late legislative stage, but the measure is not necessarily enacted law.",
+      next: "Check presidential action, the latest bill status, any public law number, effective provisions, and implementing regulations.",
+      jurisdiction: "United States federal legislation",
+      sourceLabel: "Congress.gov RSS",
+      sourceUrl: entry.link,
+      date: channelDate,
+      agency: "United States Congress"
+    }));
+  }
+
+  function recallVehicleContext() {
+    const vehicle = currentVehicle();
+    const decoded = state.decodedVin || {};
+    const equipmentMode = state.mode === "all" ? vehicle.mode : state.mode;
+    if (!["car", "truck"].includes(equipmentMode)) return null;
+    return {
+      year: decoded.year || vehicle.year,
+      make: decoded.make || vehicle.make,
+      model: decoded.model || vehicle.model
+    };
+  }
+
+  async function fetchRecallItems() {
+    const vehicle = recallVehicleContext();
+    if (!vehicle || !vehicle.year || !vehicle.make || !vehicle.model) return [];
+    const params = new URLSearchParams({
+      make: vehicle.make,
+      model: vehicle.model,
+      modelYear: String(vehicle.year)
+    });
+    const response = await fetchWithTimeout(`https://api.nhtsa.gov/recalls/recallsByVehicle?${params.toString()}`);
+    const body = await response.json();
+    const campaigns = new Map();
+    (body.results || []).forEach((entry) => {
+      if (entry.NHTSACampaignNumber && !campaigns.has(entry.NHTSACampaignNumber)) {
+        campaigns.set(entry.NHTSACampaignNumber, entry);
+      }
+    });
+    return Array.from(campaigns.values()).slice(0, 6).map((entry) => ({
+      id: `recall:${entry.NHTSACampaignNumber}`,
+      sourceType: "recalls",
+      status: "Safety recall",
+      title: `${readableAgencyText(entry.Component || "Vehicle equipment")}: ${vehicle.year} ${vehicle.make} ${vehicle.model}`,
+      summary: readableAgencyText(entry.Summary || "Open the NHTSA recall record for details."),
+      why: readableAgencyText(entry.Consequence || "The campaign identifies a potential safety defect or noncompliance."),
+      next: "Use the exact VIN at NHTSA Recalls and contact the manufacturer or dealer to confirm inclusion, repair status, and remedy availability.",
+      remedy: readableAgencyText(entry.Remedy || "Follow the manufacturer's official recall remedy."),
+      jurisdiction: "United States federal vehicle safety",
+      sourceLabel: `NHTSA campaign ${entry.NHTSACampaignNumber}`,
+      sourceUrl: "https://www.nhtsa.gov/recalls",
+      date: reportDateToIso(entry.ReportReceivedDate),
+      agency: entry.Manufacturer || "NHTSA"
+    }));
+  }
+
+  async function refreshWrenchieFeeds(silent = false) {
+    if (state.wrenchieLoading) return;
+    state.wrenchieLoading = true;
+    if (!silent) state.wrenchieMessage = "Checking official transportation sources...";
+    renderWrenchie();
+
+    const sourceJobs = [
+      { id: "federal-register", name: "Federal Register", load: fetchFederalRegisterItems },
+      { id: "congress", name: "Congress.gov", load: fetchCongressItems }
+    ];
+    if (recallVehicleContext()) {
+      sourceJobs.push({ id: "nhtsa-recalls", name: "NHTSA Recalls", load: fetchRecallItems });
+    }
+
+    const results = await Promise.all(sourceJobs.map(async (source) => {
+      try {
+        const items = await source.load();
+        return { id: source.id, name: source.name, ok: true, count: items.length, items };
+      } catch (error) {
+        return { id: source.id, name: source.name, ok: false, count: 0, items: [], message: error.message };
+      }
+    }));
+
+    const successful = results.filter((result) => result.ok);
+    if (successful.length) {
+      const itemMap = new Map();
+      results.flatMap((result) => result.items).forEach((item) => itemMap.set(item.id, item));
+      state.wrenchieCache = {
+        contextKey: wrenchieContextKey(),
+        updatedAt: new Date().toISOString(),
+        items: Array.from(itemMap.values()),
+        sources: results.map(({ items, ...source }) => source)
+      };
+      await storageSet({ wrenchieCache: state.wrenchieCache });
+      state.wrenchieMessage = results.some((result) => !result.ok)
+        ? "Some official sources were unavailable; current results and the last local cache remain visible."
+        : "Official transportation sources are current.";
+    } else {
+      state.wrenchieMessage = "Official sources are temporarily unavailable. Safety lessons and saved briefs remain available.";
+    }
+    state.wrenchieLoading = false;
+    renderWrenchie();
+  }
+
+  function queueWrenchieRefresh() {
+    window.clearTimeout(wrenchieRefreshTimer);
+    wrenchieRefreshTimer = window.setTimeout(() => refreshWrenchieFeeds(true), 350);
+  }
+
+  function wrenchieCacheNeedsRefresh() {
+    const cache = state.wrenchieCache;
+    if (!cache || cache.contextKey !== wrenchieContextKey()) return true;
+    const age = Date.now() - new Date(cache.updatedAt).getTime();
+    return !Number.isFinite(age) || age > WRENCHIE_CACHE_TTL;
   }
 
   function renderToolTabs() {
@@ -957,6 +1615,8 @@
     renderTools();
     renderWorkflow();
     renderSaved();
+    renderWrenchie();
+    renderWrenchieCoach();
   }
 
   async function persistWorkspace() {
@@ -1091,6 +1751,7 @@
       saveDecodedVehicle(decoded, matched);
       render();
       await persistWorkspace();
+      queueWrenchieRefresh();
     } catch (error) {
       state.decodedVin = { vin: "Check failed", make: error.message, model: "", year: "" };
       renderRail();
@@ -1202,6 +1863,7 @@
       syncSelectionDefaults();
       render();
       persistWorkspace();
+      queueWrenchieRefresh();
     });
 
     els.makeSelect.addEventListener("change", () => {
@@ -1210,6 +1872,7 @@
       syncSelectionDefaults();
       render();
       persistWorkspace();
+      queueWrenchieRefresh();
     });
 
     els.vehicleSelect.addEventListener("change", () => {
@@ -1219,6 +1882,7 @@
       syncSelectionDefaults();
       render();
       persistWorkspace();
+      queueWrenchieRefresh();
     });
 
     els.systemSelect.addEventListener("change", () => {
@@ -1245,6 +1909,19 @@
       state.repairNotes[currentProcedureKey()] = els.jobNotes.value;
     });
     els.jobNotes.addEventListener("change", persistWorkspace);
+
+    [els.mascotGuideButton, els.wrenchieCoachMascot].filter(Boolean).forEach((button) => {
+      button.addEventListener("click", () => advanceWrenchieCoach(button));
+    });
+    document.querySelectorAll("[data-coach-action]").forEach((button) => {
+      button.addEventListener("click", () => runWrenchieCoachAction(button.dataset.coachAction));
+    });
+    if (els.wrenchieDeskMascotButton) {
+      els.wrenchieDeskMascotButton.addEventListener("click", () => {
+        animateWrenchie(els.wrenchieDeskMascotButton);
+        els.wrenchieSearchInput.focus();
+      });
+    }
 
     els.zoomIn.addEventListener("click", () => {
       state.zoom = Math.min(1.45, Number((state.zoom + 0.1).toFixed(2)));
@@ -1309,26 +1986,72 @@
       syncSelectionDefaults();
       render();
       await persistWorkspace();
+      queueWrenchieRefresh();
     });
 
     els.themeToggle.addEventListener("click", () => {
       document.body.classList.toggle("high-contrast");
     });
+
+    els.wrenchieRefreshButton.addEventListener("click", () => refreshWrenchieFeeds(false));
+    els.wrenchieSearchForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      state.wrenchieQuery = els.wrenchieSearchInput.value.trim();
+      state.wrenchieMessage = "";
+      if (state.wrenchieQuery) {
+        const ranked = allWrenchieItems()
+          .map((item) => ({ item, score: wrenchieSearchScore(item, state.wrenchieQuery) }))
+          .filter((entry) => entry.score > 0)
+          .sort((a, b) => b.score - a.score);
+        if (ranked.length) {
+          const best = ranked[0].item;
+          state.wrenchieSelectedId = best.id;
+          if (best.id.startsWith("lesson:")) state.wrenchieView = "learn";
+          else if (wrenchieLiveItems().some((item) => item.id === best.id)) state.wrenchieView = "live";
+          else state.wrenchieView = "saved";
+          state.wrenchieMessage = `Mr. Wrenchie found ${ranked.length} source-backed match${ranked.length === 1 ? "" : "es"}.`;
+        } else {
+          state.wrenchieMessage = "No exact source-backed match. Try work zones, recalls, proposed rules, or hours of service.";
+        }
+      }
+      renderWrenchie();
+    });
+
+    document.querySelectorAll("[data-wrenchie-view]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.wrenchieView = button.dataset.wrenchieView;
+        state.wrenchieQuery = "";
+        state.wrenchieMessage = "";
+        els.wrenchieSearchInput.value = "";
+        renderWrenchie();
+      });
+    });
+
+    document.querySelectorAll("[data-wrenchie-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.wrenchieFilter = button.dataset.wrenchieFilter;
+        state.wrenchieMessage = "";
+        renderWrenchie();
+      });
+    });
   }
 
   async function init() {
-    const saved = await storageGet(["workspaceState", "savedVehicles", "communityVehicles", "taskChecks", "repairNotes"]);
+    const saved = await storageGet(["workspaceState", "savedVehicles", "communityVehicles", "taskChecks", "repairNotes", "wrenchieCache", "wrenchieSavedItems"]);
     Object.assign(state, saved.workspaceState || {});
     enforceVariantMode();
     state.savedVehicles = Array.isArray(saved.savedVehicles) ? saved.savedVehicles : [];
     state.communityVehicles = Array.isArray(saved.communityVehicles) ? saved.communityVehicles : [];
     state.taskChecks = saved.taskChecks && typeof saved.taskChecks === "object" ? saved.taskChecks : {};
     state.repairNotes = saved.repairNotes && typeof saved.repairNotes === "object" ? saved.repairNotes : {};
+    state.wrenchieCache = saved.wrenchieCache && typeof saved.wrenchieCache === "object" ? saved.wrenchieCache : null;
+    state.wrenchieSavedItems = Array.isArray(saved.wrenchieSavedItems) ? saved.wrenchieSavedItems : [];
     syncSelectionDefaults();
     els.torqueToggle.checked = state.torque !== false;
     document.body.classList.toggle("hide-torque", state.torque === false);
     wireEvents();
     render();
+    if (wrenchieCacheNeedsRefresh()) refreshWrenchieFeeds(true);
   }
 
   init();

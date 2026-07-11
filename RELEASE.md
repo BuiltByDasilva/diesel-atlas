@@ -1,4 +1,4 @@
-# DieselAtlas v1.5.0
+# DieselAtlas v2.0.0
 
 Treats stored spring-brake energy, regulated inspection, and dispatch closeout as first-class workflow gates.
 

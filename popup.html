@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>WrenchAtlas</title>
+    <title>Lil Mechanic's: WrenchAtlas</title>
     <link rel="icon" href="assets/icon-32.png" sizes="32x32">
     <link rel="stylesheet" href="styles.css">
   </head>
@@ -11,12 +11,18 @@
     <main class="popup-shell">
       <div class="usa-stripe" aria-hidden="true"></div>
       <section class="popup-head">
-        <div class="mini-mark" aria-hidden="true"></div>
+        <button class="popup-mascot" id="popupWrenchieButton" type="button" aria-label="Ask Mr. Wrenchie what to do next">
+          <img src="assets/mr-wrenchie.png" alt="">
+        </button>
         <div>
-          <h1>Wrench<span>Atlas</span></h1>
-          <p id="popupEdition">American Field Edition · v1.5</p>
+          <h1><span class="family-prefix">Lil Mechanic's:</span><span class="product-name">Wrench<span>Atlas</span></span></h1>
+          <p id="popupEdition">American Field Edition · v2.0</p>
         </div>
       </section>
+      <button class="popup-wrenchie-guide" id="popupWrenchieGuide" type="button">
+        <span>Mr. Wrenchie says</span>
+        <strong id="popupWrenchieMessage">Start with the exact equipment identity, then stage the job.</strong>
+      </button>
       <form class="popup-vin" id="popupVinForm">
         <label for="popupVinInput" id="popupIdentifierLabel">Vehicle identifier</label>
         <input id="popupVinInput" placeholder="Enter identifier" autocomplete="off" spellcheck="false">

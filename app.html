@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>WrenchAtlas</title>
+    <title>Lil Mechanic's: WrenchAtlas</title>
     <link rel="icon" href="assets/icon-32.png" sizes="32x32">
     <link rel="stylesheet" href="styles.css">
   </head>
@@ -12,22 +12,22 @@
       <aside class="brand-rail" aria-label="Workspace navigation">
         <div class="usa-stripe" aria-hidden="true"></div>
         <section class="brand-lockup">
-          <div class="torque-mark" aria-hidden="true">
-            <span></span>
-          </div>
+          <span class="brand-mascot-frame" aria-hidden="true">
+            <img src="assets/mr-wrenchie.png" alt="">
+          </span>
           <div>
-            <h1>Wrench<span>Atlas</span></h1>
+            <h1><span class="family-prefix">Lil Mechanic's:</span><span class="product-name">Wrench<span>Atlas</span></span></h1>
             <p id="editionLabel">American Garage Edition</p>
           </div>
         </section>
 
-        <section class="mascot-card" aria-label="Mascot">
-          <div class="mini-mark" aria-hidden="true"></div>
+        <button class="mascot-card" id="mascotGuideButton" type="button" aria-label="Ask Mr. Wrenchie for the next repair step">
+          <span class="mascot-thumb" aria-hidden="true"><img src="assets/mr-wrenchie.png" alt=""></span>
           <div>
-            <strong id="mascotName">Liberty Torque Compass</strong>
-            <span id="mascotTagline">Know the job. Own the repair.</span>
+            <strong id="mascotName">Mr. Wrenchie</strong>
+            <span id="mascotTagline">Tap me for the next smart move.</span>
           </div>
-        </section>
+        </button>
 
         <section class="workspace-card">
           <p class="rail-label" id="workspaceLabel">Vehicle workspace</p>
@@ -54,6 +54,9 @@
           <button type="button" data-jump="diagrams">
             <span class="nav-icon">▣</span> Diagrams
           </button>
+          <button type="button" data-jump="wrenchie">
+            <span class="nav-icon">◎</span> Wrenchie Desk
+          </button>
           <button type="button" data-jump="rights">
             <span class="nav-icon">★</span> Repair Rights
           </button>
@@ -68,8 +71,8 @@
         </section>
 
         <footer class="rail-footer">
-          <span>WrenchAtlas</span>
-          <span>v1.5.0</span>
+          <span>Lil Mechanic's: WrenchAtlas</span>
+          <span>v2.0.0</span>
           <button id="themeToggle" type="button" aria-label="Toggle high contrast">◐</button>
         </footer>
       </aside>
@@ -85,6 +88,23 @@
           <button class="icon-button" id="openDataButton" type="button" title="Import open repair data" aria-label="Import open repair data">▥</button>
           <button class="icon-button" id="resetButton" type="button" title="Reset workspace">↻</button>
         </header>
+
+        <section class="wrenchie-coach" id="wrenchieCoach" aria-labelledby="wrenchieCoachTitle">
+          <button class="coach-mascot" id="wrenchieCoachMascot" type="button" aria-label="Repeat Mr. Wrenchie's guidance">
+            <img src="assets/mr-wrenchie.png" alt="Mr. Wrenchie, the Lil Mechanic's repair guide">
+          </button>
+          <div class="coach-copy" aria-live="polite">
+            <span>Mr. Wrenchie's next move</span>
+            <strong id="wrenchieCoachTitle">Confirm the equipment before reaching for a tool.</strong>
+            <p id="wrenchieCoachMessage">Use the identifier check or load the verified industry demonstration.</p>
+          </div>
+          <div class="coach-actions" aria-label="Mr. Wrenchie shortcuts">
+            <button type="button" data-coach-action="identify">Identify</button>
+            <button type="button" data-coach-action="tools">Stage tools</button>
+            <button type="button" data-coach-action="safety">Safety gate</button>
+            <button type="button" data-coach-action="ask">Ask Wrenchie</button>
+          </div>
+        </section>
 
         <section class="selector-deck" id="overview" aria-label="Vehicle and system selectors">
           <div class="mode-strip" id="modeStrip" role="tablist" aria-label="Vehicle mode"></div>
@@ -181,6 +201,59 @@
           </div>
         </section>
 
+        <section class="wrenchie-desk" id="wrenchie" aria-labelledby="wrenchieTitle">
+          <header class="wrenchie-header">
+            <div class="wrenchie-identity">
+              <button class="wrenchie-avatar" id="wrenchieDeskMascotButton" type="button" title="Ask Mr. Wrenchie" aria-label="Ask Mr. Wrenchie a source-backed question">
+                <img src="assets/mr-wrenchie.png" alt="">
+              </button>
+              <div>
+                <span class="wrenchie-kicker">Mr. Wrenchie's source desk</span>
+                <h2 id="wrenchieTitle">Ask Mr. Wrenchie</h2>
+                <p id="wrenchiePromise">Source first. Status clear. Jurisdiction visible.</p>
+              </div>
+            </div>
+            <div class="wrenchie-source-health" aria-live="polite">
+              <span id="wrenchieSourceHealth">Official source cache</span>
+              <strong id="wrenchieLastUpdated">Waiting for first refresh</strong>
+            </div>
+            <button class="wrenchie-refresh" id="wrenchieRefreshButton" type="button" title="Refresh official transportation sources">
+              <span aria-hidden="true">↻</span> Refresh
+            </button>
+          </header>
+
+          <div class="wrenchie-toolbar">
+            <div class="wrenchie-view-tabs" role="tablist" aria-label="Wrenchie desk view">
+              <button class="active" type="button" data-wrenchie-view="live" role="tab" aria-selected="true">Live desk</button>
+              <button type="button" data-wrenchie-view="learn" role="tab" aria-selected="false">Safety library</button>
+              <button type="button" data-wrenchie-view="saved" role="tab" aria-selected="false">Saved</button>
+            </div>
+            <form class="wrenchie-search" id="wrenchieSearchForm" role="search">
+              <label class="sr-only" for="wrenchieSearchInput">Ask or search Wrenchie</label>
+              <input id="wrenchieSearchInput" type="search" autocomplete="off" placeholder="Ask about recalls, work zones, rules, or bills">
+              <button type="submit">Search</button>
+            </form>
+          </div>
+
+          <div class="wrenchie-filter-row" id="wrenchieFilterRow" aria-label="Transportation desk filters">
+            <button class="active" type="button" data-wrenchie-filter="all">All</button>
+            <button type="button" data-wrenchie-filter="rules">Rules + notices</button>
+            <button type="button" data-wrenchie-filter="legislation">Legislation</button>
+            <button type="button" data-wrenchie-filter="recalls">Recalls</button>
+          </div>
+
+          <p class="wrenchie-status" id="wrenchieStatus" aria-live="polite"></p>
+
+          <div class="wrenchie-layout">
+            <div class="wrenchie-feed" id="wrenchieFeedList" aria-label="Wrenchie transportation items"></div>
+            <aside class="wrenchie-brief" id="wrenchieBrief" aria-live="polite"></aside>
+          </div>
+
+          <footer class="wrenchie-boundary" id="wrenchieBoundary">
+            Educational information only. Verify current federal, state, local, employer, and equipment-specific requirements before acting.
+          </footer>
+        </section>
+
         <section class="rights-band" id="rights" aria-labelledby="rightsTitle">
           <header class="rights-heading">
             <span id="rightsKicker">Freedom to fix</span>
@@ -217,6 +290,7 @@
 
     <script src="variant.js"></script>
     <script src="data/vehicles.js"></script>
+    <script src="data/wrenchie-knowledge.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

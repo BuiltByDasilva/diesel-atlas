@@ -1,4 +1,4 @@
-# DieselAtlas: Truck Repair Planner
+# Lil Mechanic's: DieselAtlas
 
 Truck VIN identity, commercial air-brake safety gates, and fleet job planning.
 
@@ -8,7 +8,7 @@ Truck VIN identity, commercial air-brake safety gates, and fleet job planning.
 
 Treats stored spring-brake energy, regulated inspection, and dispatch closeout as first-class workflow gates.
 
-## Version 1.5.0
+## Version 2.0.0
 
 - User-initiated NHTSA vPIC truck VIN decode
 - Freightliner Cascadia air-brake demonstration
@@ -19,6 +19,7 @@ Treats stored spring-brake energy, regulated inspection, and dispatch closeout a
 - Local repair checks, notes, saved equipment, and imported open-data packs.
 - Original orientation diagrams; no copied manufacturer schematics.
 - Evidence quality, limitations, safety gates, and primary-source links remain visible.
+- Mr. Wrenchie interactive guidance plus an official-source desk with rulemaking, legislative watch, safety lessons, source status, search, bookmarks, and local caching.
 
 ## Accuracy And Authority
 
@@ -30,7 +31,7 @@ This extension is a planning and orientation reference, not an official service 
 - Source policy: [docs/privacy-policy.md](docs/privacy-policy.md)
 - Store listing and reviewer steps: [docs/store-listing.md](docs/store-listing.md)
 
-GarageAtlas and DieselAtlas send a user-entered VIN only to NHTSA vPIC after Decode is pressed. MarineAtlas, AeroAtlas, and RailAtlas validate identifiers locally and request no host permission. This repository contains only the permissions and dataset for **DieselAtlas**.
+All variants retrieve public Federal Register and Congress.gov data for Mr. Wrenchie's Source Desk. GarageAtlas and DieselAtlas additionally send a user-entered VIN to NHTSA vPIC after Decode and send the selected year, make, and model, but not the VIN, to the NHTSA Recalls API. MarineAtlas, AeroAtlas, and RailAtlas keep entered identifiers local. This repository contains only the permissions and dataset for **DieselAtlas**.
 
 ## Install Locally
 
@@ -43,9 +44,9 @@ GarageAtlas and DieselAtlas send a user-entered VIN only to NHTSA vPIC after Dec
 
 The tagged GitHub release includes:
 
-- `diesel-atlas-chrome-extension-v1.5.0.zip`
-- `diesel-atlas-marketing-assets-v1.5.0.zip`
-- `SHA256SUMS-v1.5.0.txt`
+- `diesel-atlas-chrome-extension-v2.0.0.zip`
+- `diesel-atlas-marketing-assets-v2.0.0.zip`
+- `SHA256SUMS-v2.0.0.txt`
 
 ## Open Source
 

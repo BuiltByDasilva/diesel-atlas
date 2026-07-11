@@ -1,8 +1,8 @@
-# DieselAtlas Chrome Web Store Listing - Version 1.5.0
+# Lil Mechanic's: DieselAtlas Chrome Web Store Listing - Version 2.0.0
 
 ## Public Name
 
-DieselAtlas: Truck Repair Planner
+Lil Mechanic's: DieselAtlas
 
 ## Short Description
 
@@ -20,13 +20,15 @@ DieselAtlas is a free, open-source, ad-free American field guide for its specifi
 
 A fleet-specific planner that treats stored spring-brake energy and regulated dispatch checks as first-class gates instead of adapting a passenger-car checklist.
 
-### Version 1.5 Features
+### Version 2.0 Features
 
 - User-initiated truck VIN decode through the official NHTSA vPIC API.
 - A Cascadia air-brake job card with wheel chocking, air-system isolation, and spring-brake stored-energy warnings.
 - Fleet closeout checks for adjustment, leaks, brake response, documentation, and dispatch authority.
 - FMCSA-linked commercial brake evidence plus exact-fleet-procedure limitations.
 - Local tool checks, workflow progress, job notes, and saved truck identity without an account.
+- Mr. Wrenchie, the interactive Lil Mechanic's guide, provides context-aware next steps and shortcuts to identity, tools, safety gates, and source-backed guidance.
+- Mr. Wrenchie's Source Desk includes official rulemaking, legislation, recall context where applicable, legal-status labels, safety lessons, local search, bookmarks, and source caching.
 
 ### Accuracy And Safety Boundary
 
@@ -58,8 +60,8 @@ The app contains no ads, analytics, affiliate links, accounts, subscriptions, pa
 
 ## Store Assets
 
-- Extension ZIP: `dist/diesel-atlas-chrome-extension-v1.5.0.zip`
-- Marketing ZIP: `dist/diesel-atlas-marketing-assets-v1.5.0.zip`
+- Extension ZIP: `dist/diesel-atlas-chrome-extension-v2.0.0.zip`
+- Marketing ZIP: `dist/diesel-atlas-marketing-assets-v2.0.0.zip`
 - Icon: `assets/apps/diesel-atlas/icon-128.png`
 - Screenshots: `screenshots/diesel-atlas/store-screenshot-1.png` through `store-screenshot-5.png`
 - Small tile: `marketing/apps/diesel-atlas/small-promo-tile-440x280.png`
@@ -71,8 +73,8 @@ The app contains no ads, analytics, affiliate links, accounts, subscriptions, pa
 
 ## Privacy Dashboard Disclosure
 
-- User input handled: 17-character truck VIN plus local repair selections, checks, and notes.
-- Network behavior: The extension sends the entered VIN to `https://vpic.nhtsa.dot.gov/*` only after the user presses Decode. The response supplies vehicle identity, not installed-equipment or service-procedure proof.
+- User input handled: 17-character truck VIN plus local repair selections, checks, notes, Wrenchie searches, and saved briefs.
+- Network behavior: The extension sends the entered VIN to `https://vpic.nhtsa.dot.gov/*` only after the user presses Decode. The response supplies vehicle identity, not installed-equipment or service-procedure proof. Wrenchie also sends the selected year, make, and model, but not the VIN, to `https://api.nhtsa.gov/*` to retrieve model-level safety recalls. Wrenchie retrieves agency rules and notices from `https://www.federalregister.gov/*` and transportation-related legislation presented to the President from `https://www.congress.gov/*`. Feed results and saved briefs are cached locally.
 - Local behavior: selected equipment, checks, notes, preferences, and imported open-data packs are stored in the extension's local Chrome storage.
 - No browsing history, website content, precise location, contacts, authentication, financial, health, or communications data.
 - No advertising, sale, profiling, lending, analytics, or routine human review.
@@ -81,9 +83,15 @@ The app contains no ads, analytics, affiliate links, accounts, subscriptions, pa
 
 ## Permissions Justification
 
-`storage`: Saves equipment selections, repair checks, local notes, imported open-data packs, and workspace preferences in the user's Chrome profile.
+`storage`: Saves equipment selections, repair checks, local notes, imported open-data packs, Wrenchie feed cache, saved briefs, and workspace preferences in the user's Chrome profile.
+
+`https://www.federalregister.gov/*`: Retrieves current rules, proposed rules, and notices for the app's transportation agencies.
+
+`https://www.congress.gov/*`: Retrieves the official Bills Presented to the President RSS feed and filters transportation matches locally.
 
 `https://vpic.nhtsa.dot.gov/*`: Required only for the user-initiated VIN decode described above.
+
+`https://api.nhtsa.gov/*`: Retrieves model-level recalls for the selected year, make, and model; exact applicability still requires a VIN check.
 
 ## Reviewer Test Instructions
 
@@ -103,4 +111,4 @@ The app contains no ads, analytics, affiliate links, accounts, subscriptions, pa
 
 ## Release Notes
 
-Version 1.5 launches DieselAtlas as one focused member of the Atlas repair-reference family. It adds persistent job cards, domain-specific safety gates, original diagrams, evidence validation, a dedicated identifier workflow, patriotic visual identity, and complete privacy and review disclosures. It remains free, ad-free, account-free, and open source.
+Version 2.0 establishes the `Lil Mechanic's:` product family and introduces Mr. Wrenchie as an interactive repair guide across the workspace, popup, iconography, and source desk. He provides context-aware next steps, workflow shortcuts, official rulemaking, legislative watch, model-level recall context where applicable, source-backed safety lessons, clear legal-status labels, local search, bookmarks, and caching. DieselAtlas remains free, ad-free, account-free, and open source.
